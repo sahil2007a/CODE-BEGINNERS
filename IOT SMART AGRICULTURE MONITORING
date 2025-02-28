@@ -1,0 +1,51 @@
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+#include <DHT.h>
+#include <WiFi.h>
+#include <WiFiClient.h>
+#include <BlynkSimpleEsp32.h>
+
+// Replace with your WiFi credentials
+char auth[] = BLYNK_AUTH_TOKEN ;
+char ssid[] = "Wokwi-GUEST";
+char pass[] = "";
+
+// Blynk virtual pins
+#define POTENTIOMETER_PIN 34
+#define BLYNK_VIRTUAL_PIN V4
+#define BLYNK_TEMPERATURE_PIN V5
+#define BLYNK_HUMIDITY_PIN V2
+
+#define LED1 12
+#define RELAY 16
+
+// DHT22 Configuration
+#define DHT_PIN 4       // DHT22 data pin
+#define DHT_TYPE DHT22
+DHT dht(DHT_PIN, DHT_TYPE);
+
+// LCD I2C Configuration
+LiquidCrystal_I2C lcd(0x27, 16, 2);  // Set LCD I2C address (usually 0x27)
+
+// Variables
+int potentiometerValue;
+float voltage, temperature, humidity;
+
+// Timer to send data periodically
+BlynkTimer timer;
+
+int SW_State_M = 0;
+BLYNK_WRITE(V3) {
+  SW_State_M = param.asInt();
+  if (SW_State_M == 1) {
+    digitalWrite(LED1, HIGH);
+    digitalWrite(RELAY, HIGH);
+    Serial.println("RED ON");
+    Blynk.virtualWrite(V3, HIGH);
+  } else {
+    digitalWrite(LED1, LOW);
+    digitalWrite(RELAY, LOW);
+    Serial.println("RED OFF");
+    Blynk.virtualWrite(V3, LOW);
+  }
+}
